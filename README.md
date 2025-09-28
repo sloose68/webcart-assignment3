@@ -10,8 +10,7 @@ The main purpose of these tools is to **process and transform source spreadsheet
 
 * **Data transformation**: Clean and normalise raw spreadsheet data for GIS import.
 * **DOI lookup**: Automatically find source document DOIs using Crossref.
-* **Table formatting**: Generate structured, deduplicated CSVs with consistent column names.
-* **Ecosystem classification**: Map class codes to standard ecosystem categories.
+* **Ecosystem classification**: Map class codes to standard high-level ecosystem categories.
 
 ## Usage
 
@@ -30,14 +29,3 @@ python prepare-docs.py source.xlsx output.csv
   * `requests`
   * `openpyxl` (for Excel support)
   * `rapidfuzz` (for fuzzy matching of document titles)
-
-Install dependencies via:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Notes
-
-* Scripts are intended as a **pipeline**: source spreadsheets are cleaned, normalized, and deduplicated before use in ArcGIS Pro.
-* Includes functionality for **normalising titles**, **merging duplicate rows**, and generating **structured output for GIS tables or feature layers**.
