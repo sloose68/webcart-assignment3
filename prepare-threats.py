@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import pandas as pd
+import csv
 
 
 def main():
@@ -15,12 +16,12 @@ def main():
     df = pd.read_csv(input_file)
 
     # --- Validate required columns ---
-    required_cols = ["docID", "Threat"]
+    required_cols = ["docID", "Threat", "Study focus", "Study_year"]
     df = df[required_cols]
     df = df.drop_duplicates()
 
     # --- Save output ---
-    df.to_csv(output_file, index=False)
+    df.to_csv(output_file, quoting=csv.QUOTE_MINIMAL, encoding='utf-8')
     print(f"Done! Wrote {len(df)} rows to {output_file}")
 
 

@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
 import sys
 import pandas as pd
+import csv
 
+###
+# Script to prepare ecosystems csv file.
+# Uses the result of prepared-data script
+###
 
-# function to join ecosystem class codes, and explict / inferred to simplify rows, but not lose data
+# Function to join ecosystem class codes and explicit/inferred labels
 def combine_codes(sub):
     return "; ".join(
         f"{c}, {e}"
         for c, e in zip(sub["Class code"], sub["Explicit or Inferred"])
     )
 
-
 def main():
     if len(sys.argv) != 4:
         print("Usage: python prepare-ecosystems.py <input.csv> <lookup.xlsx> <output.csv>")
         sys.exit(1)
 
-    # Expect the expanded document created by prepare-data script as the input
     input_file  = sys.argv[1]
     lookup_file = sys.argv[2]
     output_file = sys.argv[3]
-
+    
     df = pd.read_csv(input_file)
 
     # --- Validate required columns ---
-    required_cols = ["docID", "Class code", "Explicit or Inferred",
-                     "Authors", "Document title", "Year"]
+    required_cols = ["docID", "Class code", "Explicit or Inferred", "Study focus", "Study_year"]
     df = df[required_cols]
 
     df_excel = pd.read_excel(lookup_file, sheet_name="CICES V5.1", header=4)
-
-    # Strip whitespace from column names just in case
     df_excel.columns = df_excel.columns.str.strip()
 
     # Create lookup dictionary
@@ -43,21 +43,21 @@ def main():
         r"\s*\(.*?\)", "", regex=True
     )
 
-    # Now de-dup using docID and ecosystem code
+    # Group by docID and Ecosystem_Category
     dup_cols = ["docID", "Ecosystem_Category"]
-
-    # Group by the de-dup keys
     df = (
         df.groupby(dup_cols, as_index=False)
           .apply(lambda g: pd.Series({
-              "Class code": combine_codes(g)
-           }))
+              "Class code": combine_codes(g),
+              "Study_year": g["Study_year"].iloc[0],
+              "Study focus": g["Study focus"].iloc[0]
+          }))
+          .reset_index(drop=True)
     )
 
     # --- Save output ---
-    df.to_csv(output_file, index=False)
+    df.to_csv(output_file, quoting=csv.QUOTE_MINIMAL, encoding='utf-8')
     print(f"Done! Wrote {len(df)} rows to {output_file}")
-
 
 if __name__ == "__main__":
     main()

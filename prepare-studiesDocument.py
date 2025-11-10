@@ -2,7 +2,7 @@
 import sys
 import pandas as pd
 
-# === Pepares the studiesDocument  document metadata by trimming columns before 'long' ===
+# === Pepares the studiesDocument  document metadata by trimming columns after 'long' ===
 
 if len(sys.argv) != 3:
     print("Usage: python prepare-studiesDocument.py <input.xls> <output.csv>")
@@ -13,7 +13,8 @@ output_file = sys.argv[2]
 
 # Read your spreadsheet
 df = pd.read_excel(input_file)
-
+if "Year" in df.columns:
+    df = df.rename(columns={"Year": "Study_year"})
 # Replace line breaks (\n and \r) with '; ' in all string cells
 df = df.applymap(
     lambda x: x.replace('\n', '; ').replace('\r', '; ') if isinstance(x, str) else x
