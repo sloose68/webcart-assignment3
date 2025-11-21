@@ -3,7 +3,7 @@ import sys
 
 # === Script to take the modified document excel that has Long, Lat added
 # === Handles multiple points added to csv as long, lat pairs
-#
+# == Create a studies point csv
 
 if len(sys.argv) != 3:
     print("Usage: python prepare-studies-points.py <input.csv/xlsx> <output.csv>")

@@ -4,9 +4,9 @@ import pandas as pd
 import os
 
 #
-# === Script to generate a filterdata table containing expanded document data - Basically
+# === Script to generate a filterdata table containing expanded document data
 # === The data from prepare-data; It also adds the ecosystem categories (copy of the ecosystems logic)
-# === It also takes the processed file that co-ordinates and spatial information added, to include these coluumns 
+# 
 def combine_codes(sub):
     return "; ".join(
         f"{c}, {e}"
@@ -14,14 +14,13 @@ def combine_codes(sub):
     )
 
 def main():
-    if len(sys.argv) < 4 or len(sys.argv) > 5:
-        print("Usage: python prepare-filterdata.py <input.csv> <lookup.xlsx> <output.csv> [spatialdoc.xls]")
+    if len(sys.argv) != 4:
+        print("Usage: python prepare-filterdata.py <input.csv> <lookup.xlsx> <output.csv>")
         sys.exit(1)
 
     input_file      = sys.argv[1]
     lookup_file     = sys.argv[2]
     output_file     = sys.argv[3]
-    spatialdoc_file = sys.argv[4] if len(sys.argv) == 5 else None
 
     df = pd.read_csv(input_file)
 
@@ -42,16 +41,6 @@ def main():
         .apply(lambda g: pd.Series({"Class code": combine_codes(g)}), include_groups=False)
         .reset_index()
     )
-
-    # --- Optional merge with spatialdoc_file ---
-    if spatialdoc_file and os.path.exists(spatialdoc_file):
-        df_spatial = pd.read_excel(spatialdoc_file)
-
-        # Replace line breaks (\n and \r) with '; ' in all string cells
-        df_spatial = df_spatial.applymap(
-            lambda x: x.replace('\n', '; ').replace('\r', '; ') if isinstance(x, str) else x
-        )
-        df = df.merge(df_spatial[["docID", "URL", "spatial details", "polygon details"]], on="docID", how="left")
 
     # --- Save output ---
     df.to_csv(output_file, index=False)
